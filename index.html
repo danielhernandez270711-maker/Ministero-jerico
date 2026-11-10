@@ -120,9 +120,6 @@
 
     <div id="error-banner" class="hidden bg-red-500 text-white p-4 font-bold text-sm z-50 fixed top-0 left-0 right-0 shadow-lg"></div>
 
-    <!-- Datalist for Team Member Auto-Complete -->
-    <datalist id="team-directory-list"></datalist>
-
     <header class="bg-primary-theme text-white p-4 shadow-md flex items-center justify-between sticky top-0 z-40">
         <div class="flex items-center">
             <img src="7007.png" alt="Logo" class="w-12 h-12 rounded-full mr-3 bg-black object-contain" onerror="this.style.display='none'">
@@ -180,6 +177,18 @@
                 <button onclick="closeDeleteModal()" class="flex-1 bg-gray-200 text-gray-800 py-2.5 font-bold rounded-lg text-sm" data-i18n="BTN_GO_BACK" type="button">VOLVER</button>
                 <button onclick="confirmDeleteSaved()" class="flex-1 bg-red-600 text-white py-2.5 font-bold rounded-lg text-sm" data-i18n="BTN_DELETE_CONFIRM" type="button">ELIMINAR</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Team Selection Modal with Add Button (+) in Top Right -->
+    <div id="team-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="font-bold text-lg text-primary-theme" data-i18n="SELECT_TEAM_MEMBER">Seleccionar Colaborador</h3>
+                <button onclick="openAddTeamPrompt()" class="bg-primary-theme text-white w-8 h-8 rounded-full font-bold flex items-center justify-center text-lg shadow-sm hover:opacity-95" title="Agregar colaborador">+</button>
+            </div>
+            <div id="team-modal-list" class="flex-1 overflow-y-auto divide-y divide-gray-100 mb-4 border rounded p-2"></div>
+            <button onclick="closeTeamModal()" class="w-full bg-gray-800 text-white py-2.5 font-bold rounded-lg text-sm" data-i18n="CLOSE" type="button">CERRAR</button>
         </div>
     </div>
 
@@ -300,7 +309,8 @@
                 BTN_PNG: "GUARDAR PNG", BTN_PDF: "GUARDAR PDF", BTN_WA: "💬 COMPARTIR POR WHATSAPP",
                 PIC_PLACEHOLDER: "FOTO DE CAMISA", LBL_DATE: "Fecha:", LBL_TIME: "Hora:",
                 BTN_NEXT_FRI: "📅 Próximo Viernes", BTN_NEXT_SUN: "📅 Próximo Domingo",
-                DEL_CONFIRM_TITLE: "¿Eliminar plantilla?", BTN_DELETE_CONFIRM: "ELIMINAR", BTN_GO_BACK: "VOLVER"
+                DEL_CONFIRM_TITLE: "¿Eliminar plantilla?", BTN_DELETE_CONFIRM: "ELIMINAR", BTN_GO_BACK: "VOLVER",
+                SELECT_TEAM_MEMBER: "Seleccionar Colaborador", PROMPT_ADD_MEMBER: "Nombre del nuevo colaborador:"
             },
             en: {
                 APP_TITLE: "JERICHO WORSHIP MINISTRY", SUBTITLE: "Weekly Announcement Maker",
@@ -315,7 +325,8 @@
                 BTN_PNG: "SAVE PNG", BTN_PDF: "SAVE PDF", BTN_WA: "💬 SHARE VIA WHATSAPP",
                 PIC_PLACEHOLDER: "SHIRT PHOTO", LBL_DATE: "Date:", LBL_TIME: "Time:",
                 BTN_NEXT_FRI: "📅 Next Friday", BTN_NEXT_SUN: "📅 Next Sunday",
-                DEL_CONFIRM_TITLE: "Delete Template?", BTN_DELETE_CONFIRM: "DELETE", BTN_GO_BACK: "GO BACK"
+                DEL_CONFIRM_TITLE: "Delete Template?", BTN_DELETE_CONFIRM: "DELETE", BTN_GO_BACK: "GO BACK",
+                SELECT_TEAM_MEMBER: "Select Team Member", PROMPT_ADD_MEMBER: "Name of new team member:"
             }
         };
 
@@ -324,6 +335,7 @@
         let customLogoDataUrl = null;
         let serviceCounter = 0;
         let targetDeleteName = null;
+        let activeTeamInput = null;
 
         function initApp() {
             try {
@@ -331,10 +343,15 @@
                 addServiceBlock('SERVICIO VIERNES', getNextDate(5), '6:30 PM', defaultRoles);
                 addServiceBlock('SERVICIO DOMINGO', getNextDate(0), '9:00 AM', defaultRoles);
 
-                document.addEventListener('input', function(e) {
+                document.addEventListener('change', function(e) {
                     updatePreview();
-                    if(e.target.classList.contains('role-person-input')) {
-                        saveTeamMember(e.target.value);
+                });
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+                        e.preventDefault();
+                        e.target.blur();
+                        updatePreview();
                     }
                 });
 
@@ -357,7 +374,6 @@
                         }
                     });
                 }
-                loadTeamDirectory();
                 renderSavedList();
                 updatePreview();
                 window.addEventListener('resize', scalePreview);
@@ -379,30 +395,62 @@
             return `${dayNum}/${monthNum}/${year}`;
         }
 
-        function saveTeamMember(name) {
-            const cleanName = name.trim();
-            if(!cleanName || cleanName.length < 2) return;
-            try {
-                let list = JSON.parse(localStorage.getItem('jerico-team') || '[]');
-                if(!list.includes(cleanName)) {
-                    list.push(cleanName);
-                    localStorage.setItem('jerico-team', JSON.stringify(list));
-                    loadTeamDirectory();
-                }
-            } catch(e) {}
+        function openTeamModal(btn) {
+            activeTeamInput = btn.previousElementSibling;
+            renderTeamModalList();
+            document.getElementById('team-modal').classList.remove('hidden');
         }
 
-        function loadTeamDirectory() {
+        function renderTeamModalList() {
+            const listDiv = document.getElementById('team-modal-list');
             try {
                 let list = JSON.parse(localStorage.getItem('jerico-team') || '[]');
-                const datalist = document.getElementById('team-directory-list');
-                datalist.innerHTML = '';
-                list.forEach(name => {
-                    const opt = document.createElement('option');
-                    opt.value = name;
-                    datalist.appendChild(opt);
-                });
-            } catch(e) {}
+                if(list.length === 0) {
+                    listDiv.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">No hay colaboradores guardados. Usa el botón + arriba a la derecha para agregar uno.</div>';
+                } else {
+                    let html = '';
+                    list.sort().forEach(name => {
+                        html += `<div class="p-3 hover:bg-gray-100 cursor-pointer font-medium text-sm flex justify-between items-center" onclick="selectTeamMember('${name.replace(/'/g, "\\'")}')">
+                            <span>${name}</span>
+                            <span class="text-primary-theme font-bold text-xs">✔</span>
+                        </div>`;
+                    });
+                    listDiv.innerHTML = html;
+                }
+            } catch(e) {
+                listDiv.innerHTML = '<div class="p-4 text-center text-red-400 text-sm">Error cargando lista.</div>';
+            }
+        }
+
+        function openAddTeamPrompt() {
+            const currentLang = document.getElementById('set-lang').value || 'es';
+            const msg = translations[currentLang].PROMPT_ADD_MEMBER || "Nombre del nuevo colaborador:";
+            const newName = prompt(msg);
+            if(newName && newName.trim().length > 0) {
+                const clean = newName.trim();
+                try {
+                    let list = JSON.parse(localStorage.getItem('jerico-team') || '[]');
+                    if(!list.includes(clean)) {
+                        list.push(clean);
+                        localStorage.setItem('jerico-team', JSON.stringify(list));
+                    }
+                    renderTeamModalList();
+                } catch(e) {}
+            }
+        }
+
+        function selectTeamMember(name) {
+            if(activeTeamInput) {
+                activeTeamInput.value = name;
+                activeTeamInput.dispatchEvent(new Event('change'));
+                updatePreview();
+            }
+            closeTeamModal();
+        }
+
+        function closeTeamModal() {
+            activeTeamInput = null;
+            document.getElementById('team-modal').classList.add('hidden');
         }
 
         function addServiceBlock(title = 'NUEVO SERVICIO', date = '', time = '', roles = []) {
@@ -478,9 +526,12 @@
             const row = document.createElement('div');
             row.className = 'flex items-center gap-2 role-row';
             row.innerHTML = `
-                <input type="text" class="role-name-input w-[100px] sm:w-32 border border-gray-300 rounded p-1.5 text-[10px] sm:text-xs font-bold uppercase bg-gray-100" value="${roleName}" placeholder="Rol">
-                <input type="text" list="team-directory-list" class="role-person-input flex-1 border border-gray-300 rounded p-1.5 text-sm" value="${personName}" placeholder="Nombre">
-                <button onclick="this.parentElement.remove(); updatePreview();" class="text-red-500 font-bold px-2 py-1 text-xs bg-red-50 rounded border border-red-100" type="button">X</button>
+                <input type="text" class="role-name-input w-[90px] sm:w-28 border border-gray-300 rounded p-1.5 text-[10px] sm:text-xs font-bold uppercase bg-gray-100" value="${roleName}" placeholder="Rol">
+                <div class="relative flex-1 flex items-center">
+                    <input type="text" class="role-person-input w-full border border-gray-300 rounded p-1.5 pr-8 text-sm" value="${personName}" placeholder="Nombre">
+                    <button type="button" onclick="openTeamModal(this)" class="absolute right-1 text-gray-500 hover:text-primary-theme font-bold px-1.5 py-1 text-xs focus:outline-none" title="Ver colaboradores guardados">&#9662;</button>
+                </div>
+                <button onclick="this.parentElement.remove(); updatePreview();" class="text-red-500 font-bold px-2 py-1 text-xs bg-red-50 rounded border border-red-100 shrink-0" type="button">X</button>
             `;
             container.appendChild(row);
             updatePreview();
@@ -506,7 +557,6 @@
                         const pName = row.querySelector('.role-person-input').value;
                         if (pName.trim() !== '') {
                             listHtml += '<li><span class="role-label">• ' + rName + ':</span> <span class="role-value">' + pName + '</span></li>';
-                            saveTeamMember(pName);
                         }
                     });
 
@@ -750,7 +800,7 @@
         function loadSaved(name) {
             try {
                 const savedRaw = localStorage.getItem('jerico-anuncios');
-                const savedList = savedRaw ? JSON.parse(savedRaw) : {};
+                const savedList = savedRaw ? JSON.parse(savedList) : {};
                 if(savedList[name]) loadFormData(savedList[name].data);
             } catch(e) {
                 alert("Error: " + e.message);
