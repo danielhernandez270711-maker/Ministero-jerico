@@ -199,62 +199,67 @@
             <p class="text-xs text-center text-gray-500 mb-4">La vista previa se ajusta a tu pantalla. El PNG/PDF se exportará en alta calidad.</p>
             
             <div class="overflow-hidden border-2 border-gray-300 rounded-lg shadow-lg bg-gray-200 flex justify-center items-start pt-4 pb-4 w-full h-[70vh] overflow-y-auto" id="preview-wrapper">
-                <!-- Scaled Poster -->
-                <div id="poster-preview">
-                    <!-- Top Logos & Title -->
-                    <div class="flex justify-between items-center mb-8 relative">
-                        <img src="7007.png" class="logo-img absolute left-0 top-0 rounded-full bg-black object-contain custom-logo" alt="Logo">
-                        <div class="flex-1 text-center px-24">
-                            <h1 class="poster-header-text">ALABANZA MINISTERIO JERICO</h1>
+                
+                <!-- NEW: Wrapper to fix centering alignment on mobile -->
+                <div id="scale-wrapper" class="relative">
+                    <!-- Scaled Poster -->
+                    <div id="poster-preview">
+                        <!-- Top Logos & Title -->
+                        <div class="flex justify-between items-center mb-8 relative">
+                            <img src="7007.png" class="logo-img absolute left-0 top-0 rounded-full bg-black object-contain custom-logo" alt="Logo">
+                            <div class="flex-1 text-center px-24">
+                                <h1 class="poster-header-text">ALABANZA MINISTERIO JERICO</h1>
+                            </div>
+                            <img src="7007.png" class="logo-img absolute right-0 top-0 rounded-full bg-black object-contain custom-logo" alt="Logo">
                         </div>
-                        <img src="7007.png" class="logo-img absolute right-0 top-0 rounded-full bg-black object-contain custom-logo" alt="Logo">
-                    </div>
 
-                    <!-- Dates -->
-                    <div class="grid grid-cols-2 gap-8 mb-12">
-                        <div class="date-box">
-                            <div class="text-sm font-bold text-gray-500 mb-1">FECHA Y HORA</div>
-                            <div class="text-2xl font-bold" id="out-v-fecha">10/06/2026</div>
-                            <div class="text-2xl font-bold" id="out-v-hora">6:30 PM</div>
-                        </div>
-                        <div class="date-box">
-                            <div class="text-sm font-bold text-gray-500 mb-1">FECHA Y HORA</div>
-                            <div class="text-2xl font-bold" id="out-d-fecha">10/08/2026</div>
-                            <div class="text-2xl font-bold" id="out-d-hora">9:00 AM</div>
-                        </div>
-                    </div>
-
-                    <!-- Services -->
-                    <div class="grid grid-cols-2 gap-8 mb-12">
-                        <div class="poster-box">
-                            <div class="box-title">SERVICIO VIERNES</div>
-                            <ul class="role-list" id="out-v-roles"></ul>
-                        </div>
-                        <div class="poster-box">
-                            <div class="box-title">SERVICIO DOMINGO</div>
-                            <ul class="role-list" id="out-d-roles"></ul>
-                        </div>
-                    </div>
-
-                    <!-- Bottom row -->
-                    <div class="grid grid-cols-2 gap-8">
-                        <div class="poster-box flex flex-col justify-center text-center p-8">
-                            <div class="box-title">ORACIÓN NOCTURNA</div>
-                            <div class="text-2xl font-bold mb-8" id="out-ora-titulo">SEMANA DE AYUNO</div>
-                            <div class="text-xl font-bold text-gray-800 uppercase" id="out-ora-dias">MARTES MIERCOLES Y JUEVES</div>
-                        </div>
-                        <div class="poster-box text-center">
-                            <div class="box-title">CAMISA DOMINGO <span id="out-camisa-titulo">BLANCA</span></div>
-                            <div class="h-[250px] mt-4 flex items-center justify-center">
-                                <img id="out-camisa-foto" class="max-h-full max-w-full object-contain" style="display:none;">
-                                <div id="out-camisa-placeholder" class="text-gray-400 font-bold border-2 border-dashed border-gray-300 w-full h-full flex items-center justify-center">FOTO DE CAMISA</div>
+                        <!-- Dates -->
+                        <div class="grid grid-cols-2 gap-8 mb-12">
+                            <div class="date-box">
+                                <div class="text-sm font-bold text-gray-500 mb-1">FECHA Y HORA</div>
+                                <div class="text-2xl font-bold" id="out-v-fecha">10/06/2026</div>
+                                <div class="text-2xl font-bold" id="out-v-hora">6:30 PM</div>
+                            </div>
+                            <div class="date-box">
+                                <div class="text-sm font-bold text-gray-500 mb-1">FECHA Y HORA</div>
+                                <div class="text-2xl font-bold" id="out-d-fecha">10/08/2026</div>
+                                <div class="text-2xl font-bold" id="out-d-hora">9:00 AM</div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Bottom Logo -->
-                    <img src="7007.png" class="bottom-logo rounded-full bg-black object-contain custom-logo" alt="Logo Centro">
+                        <!-- Services -->
+                        <div class="grid grid-cols-2 gap-8 mb-12">
+                            <div class="poster-box">
+                                <div class="box-title">SERVICIO VIERNES</div>
+                                <ul class="role-list" id="out-v-roles"></ul>
+                            </div>
+                            <div class="poster-box">
+                                <div class="box-title">SERVICIO DOMINGO</div>
+                                <ul class="role-list" id="out-d-roles"></ul>
+                            </div>
+                        </div>
+
+                        <!-- Bottom row -->
+                        <div class="grid grid-cols-2 gap-8">
+                            <div class="poster-box flex flex-col justify-center text-center p-8">
+                                <div class="box-title">ORACIÓN NOCTURNA</div>
+                                <div class="text-2xl font-bold mb-8" id="out-ora-titulo">SEMANA DE AYUNO</div>
+                                <div class="text-xl font-bold text-gray-800 uppercase" id="out-ora-dias">MARTES MIERCOLES Y JUEVES</div>
+                            </div>
+                            <div class="poster-box text-center">
+                                <div class="box-title">CAMISA DOMINGO <span id="out-camisa-titulo">BLANCA</span></div>
+                                <div class="h-[250px] mt-4 flex items-center justify-center">
+                                    <img id="out-camisa-foto" class="max-h-full max-w-full object-contain" style="display:none;">
+                                    <div id="out-camisa-placeholder" class="text-gray-400 font-bold border-2 border-dashed border-gray-300 w-full h-full flex items-center justify-center">FOTO DE CAMISA</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Logo -->
+                        <img src="7007.png" class="bottom-logo rounded-full bg-black object-contain custom-logo" alt="Logo Centro">
+                    </div>
                 </div>
+                
             </div>
         </div>
 
@@ -385,13 +390,20 @@
         // Scale poster for preview
         function scalePreview() {
             const wrapper = document.getElementById('preview-wrapper');
+            const scaleWrapper = document.getElementById('scale-wrapper');
             const poster = document.getElementById('poster-preview');
             
             if(!wrapper || !poster || poster.offsetWidth === 0) return;
             
-            const scale = (wrapper.clientWidth - 40) / 1000; 
+            const scale = (wrapper.clientWidth - 24) / 1000; 
+            
             poster.style.transform = `scale(${scale})`;
-            wrapper.style.height = `${poster.offsetHeight * scale + 40}px`;
+            
+            // Adjust the wrapper so flexbox centers the newly scaled size properly
+            if (scaleWrapper) {
+                scaleWrapper.style.width = `${1000 * scale}px`;
+                scaleWrapper.style.height = `${poster.offsetHeight * scale}px`;
+            }
         }
 
         // Test Logo Override
