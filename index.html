@@ -138,18 +138,24 @@
                 </div>
             </div>
 
-            <!-- Viernes Roles -->
+            <!-- Viernes Roles (Dynamic) -->
             <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                <h2 class="font-bold text-[#8b5a2b] mb-3">SERVICIO VIERNES</h2>
-                <div class="space-y-2 text-sm" id="viernes-inputs">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="font-bold text-[#8b5a2b]">SERVICIO VIERNES</h2>
+                    <button onclick="addRoleField('viernes')" class="bg-[#8b5a2b] text-white text-xs px-2 py-1 rounded font-bold">+ Agregar Persona/Instrumento</button>
+                </div>
+                <div class="space-y-3 text-sm" id="viernes-inputs">
                     <!-- JS populated -->
                 </div>
             </div>
 
-            <!-- Domingo Roles -->
+            <!-- Domingo Roles (Dynamic) -->
             <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                <h2 class="font-bold text-[#8b5a2b] mb-3">SERVICIO DOMINGO</h2>
-                <div class="space-y-2 text-sm" id="domingo-inputs">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="font-bold text-[#8b5a2b]">SERVICIO DOMINGO</h2>
+                    <button onclick="addRoleField('domingo')" class="bg-[#8b5a2b] text-white text-xs px-2 py-1 rounded font-bold">+ Agregar Persona/Instrumento</button>
+                </div>
+                <div class="space-y-3 text-sm" id="domingo-inputs">
                     <!-- JS populated -->
                 </div>
             </div>
@@ -200,7 +206,6 @@
             
             <div class="overflow-hidden border-2 border-gray-300 rounded-lg shadow-lg bg-gray-200 flex justify-center items-start pt-4 pb-4 w-full h-[70vh] overflow-y-auto" id="preview-wrapper">
                 
-                <!-- NEW: Wrapper to fix centering alignment on mobile -->
                 <div id="scale-wrapper" class="relative">
                     <!-- Scaled Poster -->
                     <div id="poster-preview">
@@ -279,39 +284,20 @@
     </main>
 
     <script>
-        const roles = [
+        const defaultRoles = [
             "PRESIDE", "SEGUNDA VOZ", "CORO 1", "CORO 2", 
             "CORO 3", "CORO 4", "PIANO 1", "PIANO 2", "BATERÍA"
         ];
         
         let customLogoDataUrl = null;
 
-        // Initialize Form
+        // Initialize Form with default items or empty dynamic list
         function initApp() {
-            const vContainer = document.getElementById('viernes-inputs');
-            const dContainer = document.getElementById('domingo-inputs');
-            
-            roles.forEach((role, i) => {
-                // Viernes
-                vContainer.innerHTML += `
-                    <div class="flex items-center gap-2">
-                        <label class="w-28 text-xs font-bold text-gray-600 text-right uppercase">${role}</label>
-                        <input type="text" id="in-v-r${i}" class="flex-1 border rounded p-1.5 text-sm" placeholder="Nombre">
-                    </div>
-                `;
-                // Domingo
-                dContainer.innerHTML += `
-                    <div class="flex items-center gap-2">
-                        <label class="w-28 text-xs font-bold text-gray-600 text-right uppercase">${role}</label>
-                        <input type="text" id="in-d-r${i}" class="flex-1 border rounded p-1.5 text-sm" placeholder="Nombre">
-                    </div>
-                `;
-            });
+            loadDefaultRows('viernes', defaultRoles);
+            loadDefaultRows('domingo', defaultRoles);
 
-            // Add Event Listeners for Live Preview
-            document.querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', updatePreview);
-            });
+            // Add Event Listeners for Live Preview on any input change
+            document.addEventListener('input', updatePreview);
 
             // Image Upload
             document.getElementById('in-camisa-foto').addEventListener('change', function(e) {
@@ -327,7 +313,6 @@
                         document.getElementById('out-camisa-foto').style.display = 'block';
                         document.getElementById('out-camisa-placeholder').style.display = 'none';
                         
-                        // Store it in dataset for saving
                         document.getElementById('in-camisa-foto').dataset.base64 = imgDataUrl;
                     }
                     reader.readAsDataURL(file);
@@ -337,6 +322,31 @@
             renderSavedList();
             scalePreview();
             window.addEventListener('resize', scalePreview);
+        }
+
+        function loadDefaultRows(day, list) {
+            const container = document.getElementById(`${day}-inputs`);
+            container.innerHTML = '';
+            list.forEach(role => {
+                appendRoleRow(day, role, '');
+            });
+        }
+
+        function appendRoleRow(day, roleName, personName) {
+            const container = document.getElementById(`${day}-inputs`);
+            const div = document.createElement('div');
+            div.className = 'flex items-center gap-2 role-row';
+            div.innerHTML = `
+                <input type="text" class="role-name-input w-36 border rounded p-1.5 text-xs font-bold uppercase bg-gray-50" value="${roleName}" placeholder="Puesto/Instrumento">
+                <input type="text" class="role-person-input flex-1 border rounded p-1.5 text-sm" value="${personName}" placeholder="Nombre de persona">
+                <button onclick="this.parentElement.remove(); updatePreview();" class="text-red-500 font-bold px-2 py-1 text-xs bg-red-50 rounded">X</button>
+            `;
+            container.appendChild(div);
+            updatePreview();
+        }
+
+        function addRoleField(day) {
+            appendRoleRow(day, 'NUEVO PUESTO', '');
         }
 
         // Tab Switching
@@ -365,18 +375,26 @@
             document.getElementById('out-d-fecha').innerText = document.getElementById('in-d-fecha').value || 'FECHA';
             document.getElementById('out-d-hora').innerText = document.getElementById('in-d-hora').value || 'HORA';
 
-            // Roles
+            // Dynamic Roles for Viernes
             const outV = document.getElementById('out-v-roles');
-            const outD = document.getElementById('out-d-roles');
             outV.innerHTML = '';
+            document.querySelectorAll('#viernes-inputs .role-row').forEach(row => {
+                const rName = row.querySelector('.role-name-input').value;
+                const pName = row.querySelector('.role-person-input').value;
+                if (pName.trim() !== '') {
+                    outV.innerHTML += `<li>• <strong>${rName}:</strong> ${pName}</li>`;
+                }
+            });
+
+            // Dynamic Roles for Domingo
+            const outD = document.getElementById('out-d-roles');
             outD.innerHTML = '';
-            
-            roles.forEach((role, i) => {
-                const valV = document.getElementById(`in-v-r${i}`).value;
-                const valD = document.getElementById(`in-d-r${i}`).value;
-                
-                if (valV) outV.innerHTML += `<li>• <strong>${role}:</strong> ${valV}</li>`;
-                if (valD) outD.innerHTML += `<li>• <strong>${role}:</strong> ${valD}</li>`;
+            document.querySelectorAll('#domingo-inputs .role-row').forEach(row => {
+                const rName = row.querySelector('.role-name-input').value;
+                const pName = row.querySelector('.role-person-input').value;
+                if (pName.trim() !== '') {
+                    outD.innerHTML += `<li>• <strong>${rName}:</strong> ${pName}</li>`;
+                }
             });
 
             // Oracion
@@ -396,10 +414,8 @@
             if(!wrapper || !poster || poster.offsetWidth === 0) return;
             
             const scale = (wrapper.clientWidth - 24) / 1000; 
-            
             poster.style.transform = `scale(${scale})`;
             
-            // Adjust the wrapper so flexbox centers the newly scaled size properly
             if (scaleWrapper) {
                 scaleWrapper.style.width = `${1000 * scale}px`;
                 scaleWrapper.style.height = `${poster.offsetHeight * scale}px`;
@@ -422,6 +438,17 @@
         }
 
         // Save & Load Functionality
+        function getDayData(dayId) {
+            let list = [];
+            document.querySelectorAll(`#${dayId}-inputs .role-row`).forEach(row => {
+                list.push({
+                    role: row.querySelector('.role-name-input').value,
+                    person: row.querySelector('.role-person-input').value
+                });
+            });
+            return list;
+        }
+
         function getFormData() {
             let data = {
                 vFecha: document.getElementById('in-v-fecha').value,
@@ -432,15 +459,9 @@
                 oraDias: document.getElementById('in-ora-dias').value,
                 camisaTitulo: document.getElementById('in-camisa-titulo').value,
                 camisaImg: document.getElementById('in-camisa-foto').dataset.base64 || null,
-                viernes: [],
-                domingo: []
+                viernes: getDayData('viernes'),
+                domingo: getDayData('domingo')
             };
-            
-            roles.forEach((_, i) => {
-                data.viernes.push(document.getElementById(`in-v-r${i}`).value);
-                data.domingo.push(document.getElementById(`in-d-r${i}`).value);
-            });
-            
             return data;
         }
 
@@ -453,10 +474,19 @@
             document.getElementById('in-ora-dias').value = data.oraDias || '';
             document.getElementById('in-camisa-titulo').value = data.camisaTitulo || '';
             
-            roles.forEach((_, i) => {
-                document.getElementById(`in-v-r${i}`).value = data.viernes[i] || '';
-                document.getElementById(`in-d-r${i}`).value = data.domingo[i] || '';
-            });
+            // Load Viernes dynamic
+            const vContainer = document.getElementById('viernes-inputs');
+            vContainer.innerHTML = '';
+            if (data.viernes && data.viernes.length > 0) {
+                data.viernes.forEach(item => appendRoleRow('viernes', item.role, item.person));
+            }
+
+            // Load Domingo dynamic
+            const dContainer = document.getElementById('domingo-inputs');
+            dContainer.innerHTML = '';
+            if (data.domingo && data.domingo.length > 0) {
+                data.domingo.forEach(item => appendRoleRow('domingo', item.role, item.person));
+            }
 
             if (data.camisaImg) {
                 document.getElementById('camisa-preview-small').src = data.camisaImg;
@@ -539,7 +569,6 @@
         async function prepareForExport() {
             updatePreview();
             const poster = document.getElementById('poster-preview');
-            // Temporarily reset transform for clean canvas capture
             poster.style.transform = 'scale(1)';
             
             const canvas = await html2canvas(poster, {
@@ -548,7 +577,7 @@
                 backgroundColor: '#fdfbf7'
             });
             
-            scalePreview(); // Restore scale
+            scalePreview();
             return canvas;
         }
 
@@ -559,8 +588,6 @@
                 btn.innerText = "GENERANDO...";
                 
                 const canvas = await prepareForExport();
-                const link = document.createElement('canvas');
-                
                 const a = document.createElement('a');
                 a.href = canvas.toDataURL("image/png", 1.0);
                 a.download = `Anuncio_Jerico_${new Date().getTime()}.png`;
@@ -568,7 +595,7 @@
                 
                 btn.innerText = originalText;
             } catch (err) {
-                alert("Error al exportar PNG. Asegúrate de que la foto no sea demasiado pesada.");
+                alert("Error al exportar PNG.");
                 console.error(err);
             }
         }
@@ -583,7 +610,6 @@
                 const imgData = canvas.toDataURL('image/jpeg', 0.9);
                 
                 const { jsPDF } = window.jspdf;
-                // calculate aspect ratio to fit on a portrait A4 page
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
@@ -598,7 +624,6 @@
             }
         }
 
-        // Start App
         window.onload = initApp;
     </script>
 </body>
