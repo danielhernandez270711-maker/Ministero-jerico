@@ -118,7 +118,6 @@
 </head>
 <body class="text-gray-800">
 
-    <!-- Global Error Banner -->
     <div id="error-banner" class="hidden bg-red-500 text-white p-4 font-bold text-sm z-50 fixed top-0 left-0 right-0 shadow-lg"></div>
 
     <header class="bg-primary-theme text-white p-4 shadow-md flex items-center justify-between sticky top-0 z-40">
@@ -258,7 +257,6 @@
     </main>
 
     <script>
-        // Global Error Handler
         window.onerror = function(msg, url, line) {
             const banner = document.getElementById('error-banner');
             if(banner) {
@@ -363,7 +361,7 @@
                     </div>
                 </div>
                 <div class="roles-container space-y-2 mb-3"></div>
-                <div><button onclick="appendRoleRow(this.previousElementSibling, 'PUESTO', '')" class="bg-primary-theme text-white text-xs px-3 py-1.5 rounded font-bold srv-btn-add" type="button">${t.BTN_ADD_ROLE}</button></div>
+                <div><button onclick="addRoleToBlock('${sId}')" class="bg-primary-theme text-white text-xs px-3 py-1.5 rounded font-bold srv-btn-add" type="button">${t.BTN_ADD_ROLE}</button></div>
             `;
             div.innerHTML = html;
             container.appendChild(div);
@@ -379,6 +377,16 @@
                 });
             }
             updatePreview();
+        }
+
+        function addRoleToBlock(blockId) {
+            const block = document.getElementById(blockId);
+            if (block) {
+                const rolesContainer = block.querySelector('.roles-container');
+                if (rolesContainer) {
+                    appendRoleRow(rolesContainer, 'PUESTO', '');
+                }
+            }
         }
 
         function appendRoleRow(container, roleName, personName) {
