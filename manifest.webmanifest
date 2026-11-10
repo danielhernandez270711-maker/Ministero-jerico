@@ -1,0 +1,20 @@
+{
+  "name": "Alabanza Ministerio Jerico",
+  "short_name": "JericoApp",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fdfbf7",
+  "theme_color": "#8b5a2b",
+  "icons": [
+    {
+      "src": "7007.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "7007.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
