@@ -120,6 +120,9 @@
 
     <div id="error-banner" class="hidden bg-red-500 text-white p-4 font-bold text-sm z-50 fixed top-0 left-0 right-0 shadow-lg"></div>
 
+    <!-- Datalist for Team Member Auto-Complete -->
+    <datalist id="team-directory-list"></datalist>
+
     <header class="bg-primary-theme text-white p-4 shadow-md flex items-center justify-between sticky top-0 z-40">
         <div class="flex items-center">
             <img src="7007.png" alt="Logo" class="w-12 h-12 rounded-full mr-3 bg-black object-contain" onerror="this.style.display='none'">
@@ -131,6 +134,7 @@
         <button onclick="toggleSettings()" class="text-2xl font-bold px-2 py-1 focus:outline-none" type="button">&#8942;</button>
     </header>
 
+    <!-- Settings Modal -->
     <div id="settings-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative">
             <h2 class="font-bold text-xl mb-4 text-primary-theme" data-i18n="SETTINGS">Configuración</h2>
@@ -164,6 +168,18 @@
                 </div>
             </div>
             <button onclick="toggleSettings()" class="w-full bg-gray-800 text-white py-3 font-bold rounded-lg mt-6" data-i18n="CLOSE" type="button">CERRAR</button>
+        </div>
+    </div>
+
+    <!-- Custom Delete Confirmation Modal -->
+    <div id="delete-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative text-center">
+            <h3 class="font-bold text-lg mb-2 text-red-600" data-i18n="DEL_CONFIRM_TITLE">¿Eliminar plantilla?</h3>
+            <p class="text-sm text-gray-600 mb-6" id="delete-modal-name"></p>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()" class="flex-1 bg-gray-200 text-gray-800 py-2.5 font-bold rounded-lg text-sm" data-i18n="BTN_GO_BACK" type="button">VOLVER</button>
+                <button onclick="confirmDeleteSaved()" class="flex-1 bg-red-600 text-white py-2.5 font-bold rounded-lg text-sm" data-i18n="BTN_DELETE_CONFIRM" type="button">ELIMINAR</button>
+            </div>
         </div>
     </div>
 
@@ -211,9 +227,14 @@
         </div>
 
         <div id="vista" class="tab-content">
-            <div class="flex gap-2 mb-4">
-                <button onclick="exportPNG(this)" class="flex-1 bg-primary-theme text-white py-3 rounded-lg font-bold text-sm shadow-md" data-i18n="BTN_PNG" type="button">GUARDAR PNG</button>
-                <button onclick="exportPDF(this)" class="flex-1 bg-gray-800 text-white py-3 rounded-lg font-bold text-sm shadow-md" data-i18n="BTN_PDF" type="button">GUARDAR PDF</button>
+            <div class="flex flex-col gap-2 mb-4">
+                <div class="flex gap-2">
+                    <button onclick="exportPNG(this)" class="flex-1 bg-primary-theme text-white py-3 rounded-lg font-bold text-sm shadow-md" data-i18n="BTN_PNG" type="button">GUARDAR PNG</button>
+                    <button onclick="exportPDF(this)" class="flex-1 bg-gray-800 text-white py-3 rounded-lg font-bold text-sm shadow-md" data-i18n="BTN_PDF" type="button">GUARDAR PDF</button>
+                </div>
+                <button onclick="shareWhatsApp(this)" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold text-sm shadow-md flex items-center justify-center gap-2" data-i18n="BTN_WA" type="button">
+                    💬 COMPARTIR POR WHATSAPP
+                </button>
             </div>
             <div class="overflow-hidden border-2 border-gray-300 rounded-lg shadow-lg bg-gray-200 flex justify-center items-start pt-4 pb-4 w-full h-[70vh] overflow-y-auto" id="preview-wrapper">
                 <div id="scale-wrapper" class="relative">
@@ -276,8 +297,10 @@
                 BOX_TITLE: "Título principal", SUBTITLE_THEME: "Subtítulo / Tema", DETAILS_TXT: "Detalles",
                 SEC_SHIRT: "SECCIÓN FOTO / CAMISA", COLOR_TITLE: "Título superior", UPLOAD_PIC: "Subir Foto",
                 SAVE_NAME: "Nombre para guardar", BTN_SAVE: "GUARDAR", LOAD_LOGO: "Cargar logo (opcional)",
-                BTN_PNG: "GUARDAR PNG", BTN_PDF: "GUARDAR PDF", PIC_PLACEHOLDER: "FOTO DE CAMISA",
-                LBL_DATE: "Fecha:", LBL_TIME: "Hora:"
+                BTN_PNG: "GUARDAR PNG", BTN_PDF: "GUARDAR PDF", BTN_WA: "💬 COMPARTIR POR WHATSAPP",
+                PIC_PLACEHOLDER: "FOTO DE CAMISA", LBL_DATE: "Fecha:", LBL_TIME: "Hora:",
+                BTN_NEXT_FRI: "📅 Próximo Viernes", BTN_NEXT_SUN: "📅 Próximo Domingo",
+                DEL_CONFIRM_TITLE: "¿Eliminar plantilla?", BTN_DELETE_CONFIRM: "ELIMINAR", BTN_GO_BACK: "VOLVER"
             },
             en: {
                 APP_TITLE: "JERICHO WORSHIP MINISTRY", SUBTITLE: "Weekly Announcement Maker",
@@ -289,8 +312,10 @@
                 BOX_TITLE: "Main Title", SUBTITLE_THEME: "Subtitle / Theme", DETAILS_TXT: "Details",
                 SEC_SHIRT: "PHOTO / SHIRT SECTION", COLOR_TITLE: "Top Title", UPLOAD_PIC: "Upload Photo",
                 SAVE_NAME: "Name to save template", BTN_SAVE: "SAVE", LOAD_LOGO: "Load custom logo (optional)",
-                BTN_PNG: "SAVE PNG", BTN_PDF: "SAVE PDF", PIC_PLACEHOLDER: "SHIRT PHOTO",
-                LBL_DATE: "Date:", LBL_TIME: "Time:"
+                BTN_PNG: "SAVE PNG", BTN_PDF: "SAVE PDF", BTN_WA: "💬 SHARE VIA WHATSAPP",
+                PIC_PLACEHOLDER: "SHIRT PHOTO", LBL_DATE: "Date:", LBL_TIME: "Time:",
+                BTN_NEXT_FRI: "📅 Next Friday", BTN_NEXT_SUN: "📅 Next Sunday",
+                DEL_CONFIRM_TITLE: "Delete Template?", BTN_DELETE_CONFIRM: "DELETE", BTN_GO_BACK: "GO BACK"
             }
         };
 
@@ -298,14 +323,21 @@
         
         let customLogoDataUrl = null;
         let serviceCounter = 0;
+        let targetDeleteName = null;
 
         function initApp() {
             try {
                 loadSettings();
-                addServiceBlock('SERVICIO VIERNES', '', '6:30 PM', defaultRoles);
-                addServiceBlock('SERVICIO DOMINGO', '', '9:00 AM', defaultRoles);
+                addServiceBlock('SERVICIO VIERNES', getNextDate(5), '6:30 PM', defaultRoles);
+                addServiceBlock('SERVICIO DOMINGO', getNextDate(0), '9:00 AM', defaultRoles);
 
-                document.addEventListener('input', updatePreview);
+                document.addEventListener('input', function(e) {
+                    updatePreview();
+                    if(e.target.classList.contains('role-person-input')) {
+                        saveTeamMember(e.target.value);
+                    }
+                });
+
                 const fileInput = document.getElementById('in-camisa-foto');
                 if (fileInput) {
                     fileInput.addEventListener('change', function(e) {
@@ -325,6 +357,7 @@
                         }
                     });
                 }
+                loadTeamDirectory();
                 renderSavedList();
                 updatePreview();
                 window.addEventListener('resize', scalePreview);
@@ -333,6 +366,43 @@
                 document.getElementById('error-banner').innerText = "Init Error: " + err.message;
                 document.getElementById('error-banner').classList.remove('hidden');
             }
+        }
+
+        function getNextDate(targetDay) {
+            const d = new Date();
+            const day = d.getDay();
+            const distance = (targetDay + 7 - day) % 7;
+            d.setDate(d.getDate() + (distance === 0 ? 7 : distance));
+            const dayNum = String(d.getDate()).padStart(2, '0');
+            const monthNum = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${dayNum}/${monthNum}/${year}`;
+        }
+
+        function saveTeamMember(name) {
+            const cleanName = name.trim();
+            if(!cleanName || cleanName.length < 2) return;
+            try {
+                let list = JSON.parse(localStorage.getItem('jerico-team') || '[]');
+                if(!list.includes(cleanName)) {
+                    list.push(cleanName);
+                    localStorage.setItem('jerico-team', JSON.stringify(list));
+                    loadTeamDirectory();
+                }
+            } catch(e) {}
+        }
+
+        function loadTeamDirectory() {
+            try {
+                let list = JSON.parse(localStorage.getItem('jerico-team') || '[]');
+                const datalist = document.getElementById('team-directory-list');
+                datalist.innerHTML = '';
+                list.forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    datalist.appendChild(opt);
+                });
+            } catch(e) {}
         }
 
         function addServiceBlock(title = 'NUEVO SERVICIO', date = '', time = '', roles = []) {
@@ -350,7 +420,7 @@
                     <input type="text" class="srv-title font-bold text-primary-theme text-lg border-b border-dashed border-gray-400 bg-transparent focus:outline-none w-2/3" value="${title}" placeholder="TÍTULO">
                     <button onclick="document.getElementById('${sId}').remove(); updatePreview();" class="text-red-500 text-xs font-bold bg-red-50 px-2 py-1 rounded" type="button">${t.BTN_DEL_DAY}</button>
                 </div>
-                <div class="grid grid-cols-2 gap-4 mb-4 bg-gray-50 p-2 rounded border">
+                <div class="grid grid-cols-2 gap-4 mb-3 bg-gray-50 p-2 rounded border">
                     <div>
                         <label class="block text-xs font-semibold mb-1 srv-lbl-date">${t.LBL_DATE}</label>
                         <input type="text" class="srv-date w-full border rounded p-1.5 text-sm" value="${date}" placeholder="Ej: 10/06/2026">
@@ -359,6 +429,10 @@
                         <label class="block text-xs font-semibold mb-1 srv-lbl-time">${t.LBL_TIME}</label>
                         <input type="text" class="srv-time w-full border rounded p-1.5 text-sm" value="${time}" placeholder="Ej: 6:30 PM">
                     </div>
+                </div>
+                <div class="flex gap-2 mb-4">
+                    <button onclick="setBlockDate('${sId}', 5)" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-[11px] font-semibold px-2 py-1 rounded srv-btn-fri" type="button">${t.BTN_NEXT_FRI}</button>
+                    <button onclick="setBlockDate('${sId}', 0)" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-[11px] font-semibold px-2 py-1 rounded srv-btn-sun" type="button">${t.BTN_NEXT_SUN}</button>
                 </div>
                 <div class="roles-container space-y-2 mb-3"></div>
                 <div><button onclick="addRoleToBlock('${sId}')" class="bg-primary-theme text-white text-xs px-3 py-1.5 rounded font-bold srv-btn-add" type="button">${t.BTN_ADD_ROLE}</button></div>
@@ -379,6 +453,17 @@
             updatePreview();
         }
 
+        function setBlockDate(blockId, targetDay) {
+            const block = document.getElementById(blockId);
+            if(block) {
+                const dateInput = block.querySelector('.srv-date');
+                if(dateInput) {
+                    dateInput.value = getNextDate(targetDay);
+                    updatePreview();
+                }
+            }
+        }
+
         function addRoleToBlock(blockId) {
             const block = document.getElementById(blockId);
             if (block) {
@@ -394,7 +479,7 @@
             row.className = 'flex items-center gap-2 role-row';
             row.innerHTML = `
                 <input type="text" class="role-name-input w-[100px] sm:w-32 border border-gray-300 rounded p-1.5 text-[10px] sm:text-xs font-bold uppercase bg-gray-100" value="${roleName}" placeholder="Rol">
-                <input type="text" class="role-person-input flex-1 border border-gray-300 rounded p-1.5 text-sm" value="${personName}" placeholder="Nombre">
+                <input type="text" list="team-directory-list" class="role-person-input flex-1 border border-gray-300 rounded p-1.5 text-sm" value="${personName}" placeholder="Nombre">
                 <button onclick="this.parentElement.remove(); updatePreview();" class="text-red-500 font-bold px-2 py-1 text-xs bg-red-50 rounded border border-red-100" type="button">X</button>
             `;
             container.appendChild(row);
@@ -421,6 +506,7 @@
                         const pName = row.querySelector('.role-person-input').value;
                         if (pName.trim() !== '') {
                             listHtml += '<li><span class="role-label">• ' + rName + ':</span> <span class="role-value">' + pName + '</span></li>';
+                            saveTeamMember(pName);
                         }
                     });
 
@@ -491,6 +577,8 @@
             document.querySelectorAll('.srv-lbl-date').forEach(el => el.innerText = t.LBL_DATE);
             document.querySelectorAll('.srv-lbl-time').forEach(el => el.innerText = t.LBL_TIME);
             document.querySelectorAll('.srv-btn-add').forEach(el => el.innerText = t.BTN_ADD_ROLE);
+            document.querySelectorAll('.srv-btn-fri').forEach(el => el.innerText = t.BTN_NEXT_FRI);
+            document.querySelectorAll('.srv-btn-sun').forEach(el => el.innerText = t.BTN_NEXT_SUN);
 
             const bottomRow = document.getElementById('out-bottom-row');
             const bottomEditors = document.querySelectorAll('.bottom-section-editor');
@@ -520,9 +608,7 @@
                     document.getElementById('set-cols').value = stored.cols || '2';
                     document.getElementById('set-show-bottom').checked = stored.showBottom !== false;
                 }
-            } catch(e) {
-                console.warn("Storage warning:", e);
-            }
+            } catch(e) {}
             applySettings();
         }
         
@@ -672,16 +758,27 @@
         }
 
         function deleteSaved(name) {
-            if(confirm('¿Eliminar / Delete "' + name + '"?')) {
-                try {
-                    const savedRaw = localStorage.getItem('jerico-anuncios');
-                    const savedList = savedRaw ? JSON.parse(savedRaw) : {};
-                    delete savedList[name];
-                    localStorage.setItem('jerico-anuncios', JSON.stringify(savedList));
-                    renderSavedList();
-                } catch(e) {
-                    alert("Error: " + e.message);
-                }
+            targetDeleteName = name;
+            document.getElementById('delete-modal-name').innerText = `"${name}"`;
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            targetDeleteName = null;
+            document.getElementById('delete-modal').classList.add('hidden');
+        }
+
+        function confirmDeleteSaved() {
+            if (!targetDeleteName) return;
+            try {
+                const savedRaw = localStorage.getItem('jerico-anuncios');
+                const savedList = savedRaw ? JSON.parse(savedRaw) : {};
+                delete savedList[targetDeleteName];
+                localStorage.setItem('jerico-anuncios', JSON.stringify(savedList));
+                closeDeleteModal();
+                renderSavedList();
+            } catch(e) {
+                alert("Error: " + e.message);
             }
         }
 
@@ -748,6 +845,47 @@
                 btn.innerText = originalText;
             } catch (err) {
                 alert("Error al exportar PDF: " + err.message);
+            }
+        }
+
+        async function shareWhatsApp(btn) {
+            try {
+                const originalText = btn.innerText;
+                btn.innerText = "PREPARANDO WHATSAPP...";
+                
+                const canvas = await prepareForExport();
+                
+                canvas.toBlob(async function(blob) {
+                    const file = new File([blob], "Anuncio_Jerico.png", { type: "image/png" });
+                    
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                title: 'Anuncio Alabanza',
+                                text: '¡Hola! Aquí está el programa y anuncio del ministerio de alabanza.',
+                                files: [file]
+                            });
+                            btn.innerText = originalText;
+                            return;
+                        } catch (err) {
+                            if (err.name !== 'AbortError') {
+                                console.warn("Share API error:", err);
+                            }
+                        }
+                    }
+                    
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = "Jerico_WhatsApp.png";
+                    a.click();
+                    
+                    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent("¡Hola equipo! Aquí adjunto la imagen del programa de alabanza. (La imagen se ha descargado a tu dispositivo para adjuntarla)."), '_blank');
+                    
+                    btn.innerText = originalText;
+                }, 'image/png');
+            } catch (err) {
+                alert("Error al compartir: " + err.message);
+                btn.innerText = "💬 COMPARTIR POR WHATSAPP";
             }
         }
 
