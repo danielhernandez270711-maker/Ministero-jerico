@@ -10,15 +10,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        :root {
+            --primary: #8b5a2b;
+            --bg: #fdfbf7;
+        }
+        
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
+        /* Theme Classes */
+        .bg-primary-theme { background-color: var(--primary) !important; }
+        .text-primary-theme { color: var(--primary) !important; }
+        .border-primary-theme { border-color: var(--primary) !important; }
+        
         /* Poster Styles */
         #poster-preview {
-            background-color: #fdfbf7;
+            background-color: var(--bg);
             color: #333;
-            width: 1000px; /* Fixed high-res width for export */
+            width: 1000px; 
             padding: 40px;
             box-sizing: border-box;
             position: relative;
@@ -26,7 +37,7 @@
         }
         
         .poster-header-text {
-            color: #8b5a2b;
+            color: var(--primary);
             font-size: 2.5rem;
             font-weight: 700;
             text-align: center;
@@ -34,17 +45,17 @@
         }
         
         .poster-box {
-            border: 2px solid #8b5a2b;
+            border: 2px solid var(--primary);
             border-radius: 12px;
             padding: 20px;
             background: #fff;
             position: relative;
-            margin-top: 30px;
+            margin-top: 25px;
             height: 100%;
         }
         
         .box-title {
-            background-color: #8b5a2b;
+            background-color: var(--primary);
             color: white;
             font-weight: bold;
             padding: 8px 20px;
@@ -59,11 +70,12 @@
         }
         
         .date-box {
-            border: 2px solid #d1bfae;
+            border: 2px solid var(--primary);
+            opacity: 0.8;
             border-radius: 12px;
             padding: 15px;
             text-align: center;
-            background: #fdfbf7;
+            background: var(--bg);
         }
         
         .role-list {
@@ -71,15 +83,25 @@
             padding: 0;
             margin-top: 15px;
             font-size: 1.1rem;
-            line-height: 1.6;
         }
         
         .role-list li {
             margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            line-height: 1.3;
         }
         
-        .role-list strong {
+        .role-label {
+            font-weight: bold;
             text-transform: uppercase;
+            margin-right: 6px;
+            flex-shrink: 0;
+        }
+        
+        .role-value {
+            word-break: break-word;
+            white-space: pre-wrap;
         }
         
         .logo-img {
@@ -99,19 +121,65 @@
 <body class="text-gray-800">
 
     <!-- App Header -->
-    <header class="bg-[#8b5a2b] text-white p-4 shadow-md flex items-center sticky top-0 z-50">
-        <img src="7007.png" alt="Logo" class="w-12 h-12 rounded-full mr-3 bg-black object-contain" onerror="this.style.display='none'">
-        <div>
-            <h1 class="font-bold text-lg leading-tight">ALABANZA MINISTERIO JERICO</h1>
-            <p class="text-xs opacity-90">Creador de anuncios semanales</p>
+    <header class="bg-primary-theme text-white p-4 shadow-md flex items-center justify-between sticky top-0 z-40">
+        <div class="flex items-center">
+            <img src="7007.png" alt="Logo" class="w-12 h-12 rounded-full mr-3 bg-black object-contain" onerror="this.style.display='none'">
+            <div>
+                <h1 class="font-bold text-lg leading-tight" id="app-title">ALABANZA MINISTERIO JERICO</h1>
+                <p class="text-xs opacity-90" data-i18n="SUBTITLE">Creador de anuncios semanales</p>
+            </div>
         </div>
+        <button onclick="toggleSettings()" class="text-2xl font-bold px-2 py-1 focus:outline-none">&#8942;</button>
     </header>
 
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative">
+            <h2 class="font-bold text-xl mb-4 text-primary-theme" data-i18n="SETTINGS">Configuración</h2>
+            
+            <div class="space-y-4 text-sm font-semibold">
+                <!-- Color Theme -->
+                <div class="flex justify-between items-center">
+                    <label data-i18n="COLOR_THEME">Color Principal (Bordes/Títulos):</label>
+                    <input type="color" id="set-primary" value="#8b5a2b" onchange="applySettings()" class="w-10 h-10 p-0 border-0 rounded cursor-pointer">
+                </div>
+                <!-- Background Color -->
+                <div class="flex justify-between items-center">
+                    <label data-i18n="COLOR_BG">Color de Fondo (Poster):</label>
+                    <input type="color" id="set-bg" value="#fdfbf7" onchange="applySettings()" class="w-10 h-10 p-0 border-0 rounded cursor-pointer">
+                </div>
+                <!-- Language -->
+                <div>
+                    <label class="block mb-1" data-i18n="LANG">Idioma / Language:</label>
+                    <select id="set-lang" onchange="applySettings()" class="w-full border rounded p-2">
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+                <!-- Layout Columns -->
+                <div>
+                    <label class="block mb-1" data-i18n="LAYOUT">Diseño de Servicios (Columnas):</label>
+                    <select id="set-cols" onchange="applySettings()" class="w-full border rounded p-2">
+                        <option value="2" data-i18n="LAY_2">2 Columnas</option>
+                        <option value="1" data-i18n="LAY_1">1 Columna</option>
+                    </select>
+                </div>
+                <!-- Show/Hide Sections -->
+                <div class="flex items-center gap-2 mt-2">
+                    <input type="checkbox" id="set-show-bottom" checked onchange="applySettings()" class="w-4 h-4">
+                    <label data-i18n="SHOW_BOTTOM">Mostrar sección Oración y Camisa</label>
+                </div>
+            </div>
+
+            <button onclick="toggleSettings()" class="w-full bg-gray-800 text-white py-3 font-bold rounded-lg mt-6" data-i18n="CLOSE">CERRAR</button>
+        </div>
+    </div>
+
     <!-- Navigation -->
-    <nav class="flex border-b border-gray-300 bg-white sticky top-[72px] z-40 overflow-x-auto">
-        <button onclick="showTab('crear')" class="tab-btn flex-1 py-3 px-4 text-sm font-semibold border-b-4 border-[#8b5a2b] text-[#8b5a2b] whitespace-nowrap" id="tab-crear">CREAR / EDITAR</button>
-        <button onclick="showTab('vista')" class="tab-btn flex-1 py-3 px-4 text-sm font-semibold border-b-4 border-transparent text-gray-500 whitespace-nowrap" id="tab-vista">VISTA PREVIA</button>
-        <button onclick="showTab('guardados')" class="tab-btn flex-1 py-3 px-4 text-sm font-semibold border-b-4 border-transparent text-gray-500 whitespace-nowrap" id="tab-guardados">GUARDADOS</button>
+    <nav class="flex border-b border-gray-300 bg-white sticky top-[72px] z-30 overflow-x-auto">
+        <button onclick="showTab('crear')" class="tab-btn flex-1 py-3 px-4 text-sm font-semibold border-b-4 border-primary-theme text-primary-theme whitespace-nowrap" id="tab-crear" data-i18n="TAB_CREATE">CREAR / EDITAR</button>
+        <button onclick="showTab('vista')" class="tab-btn flex-1 py-3 px-4 text-sm font-semibold border-b-4 border-transparent text-gray-500 whitespace-nowrap" id="tab-vista" data-i18n="TAB_PREVIEW">VISTA PREVIA</button>
+        <button onclick="showTab('guardados')" class="tab-btn flex-1 py-3 px-4 text-sm font-semibold border-b-4 border-transparent text-gray-500 whitespace-nowrap" id="tab-guardados" data-i18n="TAB_SAVED">GUARDADOS</button>
     </nav>
 
     <main class="p-4 max-w-lg mx-auto">
@@ -119,62 +187,35 @@
         <!-- Tab: CREAR / EDITAR -->
         <div id="crear" class="tab-content active space-y-6">
             
-            <!-- Dates -->
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                <h2 class="font-bold text-[#8b5a2b] mb-3">FECHA Y HORA</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">Viernes (Fecha)</label>
-                        <input type="text" id="in-v-fecha" class="w-full border rounded p-2 text-sm" placeholder="Ej: 10/06/2026">
-                        <label class="block text-xs font-semibold mt-2 mb-1">Hora</label>
-                        <input type="text" id="in-v-hora" class="w-full border rounded p-2 text-sm" value="6:30 PM">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">Domingo (Fecha)</label>
-                        <input type="text" id="in-d-fecha" class="w-full border rounded p-2 text-sm" placeholder="Ej: 10/08/2026">
-                        <label class="block text-xs font-semibold mt-2 mb-1">Hora</label>
-                        <input type="text" id="in-d-hora" class="w-full border rounded p-2 text-sm" value="9:00 AM">
-                    </div>
-                </div>
+            <!-- Dynamic Services Container -->
+            <div id="services-container" class="space-y-6">
+                <!-- Javascript will populate days here -->
             </div>
 
-            <!-- Viernes Roles (Dynamic) -->
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                <div class="flex justify-between items-center mb-3">
-                    <h2 class="font-bold text-[#8b5a2b]">SERVICIO VIERNES</h2>
-                    <button onclick="addRoleField('viernes')" class="bg-[#8b5a2b] text-white text-xs px-2 py-1 rounded font-bold">+ Agregar Persona/Instrumento</button>
-                </div>
-                <div class="space-y-3 text-sm" id="viernes-inputs">
-                    <!-- JS populated -->
-                </div>
+            <button onclick="addServiceBlock()" class="w-full bg-primary-theme text-white font-bold py-3 rounded-lg shadow-sm mb-4" data-i18n="BTN_ADD_DAY">+ AGREGAR OTRO DÍA / SERVICIO</button>
+
+            <hr class="border-gray-300">
+
+            <!-- Oracion (Bottom Left) -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 bottom-section-editor">
+                <h2 class="font-bold text-primary-theme mb-3" data-i18n="SEC_NOTICE">SECCIÓN DE AVISO / ORACIÓN</h2>
+                
+                <label class="block text-xs font-semibold mb-1" data-i18n="BOX_TITLE">Título de la caja principal</label>
+                <input type="text" id="in-ora-header" class="w-full border rounded p-2 text-sm mb-3" value="ORACIÓN NOCTURNA">
+
+                <label class="block text-xs font-semibold mb-1" data-i18n="SUBTITLE_THEME">Subtítulo / Tema</label>
+                <input type="text" id="in-ora-titulo" class="w-full border rounded p-2 text-sm mb-3" value="SEMANA DE AYUNO">
+                
+                <label class="block text-xs font-semibold mb-1" data-i18n="DETAILS_TXT">Detalles (Varias líneas permitidas)</label>
+                <textarea id="in-ora-dias" class="w-full border rounded p-2 text-sm" rows="4">MARTES MIERCOLES Y JUEVES</textarea>
             </div>
 
-            <!-- Domingo Roles (Dynamic) -->
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                <div class="flex justify-between items-center mb-3">
-                    <h2 class="font-bold text-[#8b5a2b]">SERVICIO DOMINGO</h2>
-                    <button onclick="addRoleField('domingo')" class="bg-[#8b5a2b] text-white text-xs px-2 py-1 rounded font-bold">+ Agregar Persona/Instrumento</button>
-                </div>
-                <div class="space-y-3 text-sm" id="domingo-inputs">
-                    <!-- JS populated -->
-                </div>
-            </div>
-
-            <!-- Oracion -->
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                <h2 class="font-bold text-[#8b5a2b] mb-3">ORACIÓN NOCTURNA</h2>
-                <label class="block text-xs font-semibold mb-1">Título / Tema</label>
-                <input type="text" id="in-ora-titulo" class="w-full border rounded p-2 text-sm mb-2" value="SEMANA DE AYUNO">
-                <label class="block text-xs font-semibold mb-1">Días / Info adicional</label>
-                <input type="text" id="in-ora-dias" class="w-full border rounded p-2 text-sm" value="MARTES MIERCOLES Y JUEVES">
-            </div>
-
-            <!-- Camisa -->
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                <h2 class="font-bold text-[#8b5a2b] mb-3">CAMISA DOMINGO</h2>
-                <label class="block text-xs font-semibold mb-1">Color / Título</label>
-                <input type="text" id="in-camisa-titulo" class="w-full border rounded p-2 text-sm mb-3" value="BLANCA">
-                <label class="block text-xs font-semibold mb-1">Subir Foto</label>
+            <!-- Camisa (Bottom Right) -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 bottom-section-editor">
+                <h2 class="font-bold text-primary-theme mb-3" data-i18n="SEC_SHIRT">SECCIÓN FOTO / CAMISA</h2>
+                <label class="block text-xs font-semibold mb-1" data-i18n="COLOR_TITLE">Color / Título</label>
+                <input type="text" id="in-camisa-titulo" class="w-full border rounded p-2 text-sm mb-3" value="CAMISA DOMINGO BLANCA">
+                <label class="block text-xs font-semibold mb-1" data-i18n="UPLOAD_PIC">Subir Foto</label>
                 <input type="file" id="in-camisa-foto" accept="image/*" class="w-full text-sm">
                 <div class="mt-2">
                     <img id="camisa-preview-small" class="h-24 object-contain hidden border rounded">
@@ -182,16 +223,16 @@
             </div>
 
             <!-- Save Controls -->
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-[#8b5a2b] border-l-4">
-                <label class="block text-xs font-bold mb-1">Nombre para guardar esta semana</label>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-primary-theme border-l-4 mt-8">
+                <label class="block text-xs font-bold mb-2" data-i18n="SAVE_NAME">Nombre para guardar esta plantilla</label>
                 <div class="flex gap-2">
-                    <input type="text" id="save-name" class="flex-1 border rounded p-2 text-sm" placeholder="Ej: Semana 1 Octubre">
-                    <button onclick="saveAnuncio()" class="bg-[#8b5a2b] text-white px-4 py-2 rounded font-bold">GUARDAR</button>
+                    <input type="text" id="save-name" class="flex-1 border rounded p-2 text-sm" placeholder="Ej: Semana 1">
+                    <button onclick="saveAnuncio()" class="bg-primary-theme text-white px-4 py-2 rounded font-bold" data-i18n="BTN_SAVE">GUARDAR</button>
                 </div>
             </div>
             
             <div class="pt-8 pb-4 text-center">
-                <button onclick="document.getElementById('logo-upload').click()" class="text-xs text-gray-400 underline">Cargar logo para prueba (opcional)</button>
+                <button onclick="document.getElementById('logo-upload').click()" class="text-xs text-gray-400 underline" data-i18n="LOAD_LOGO">Cargar logo personalizado (opcional)</button>
                 <input type="file" id="logo-upload" accept="image/*" class="hidden" onchange="updateLogo(event)">
             </div>
         </div>
@@ -199,10 +240,10 @@
         <!-- Tab: VISTA PREVIA -->
         <div id="vista" class="tab-content">
             <div class="flex gap-2 mb-4">
-                <button onclick="exportPNG()" class="flex-1 bg-[#8b5a2b] text-white py-3 rounded-lg font-bold text-sm shadow-md">GUARDAR IMAGEN PNG</button>
-                <button onclick="exportPDF()" class="flex-1 bg-gray-800 text-white py-3 rounded-lg font-bold text-sm shadow-md">GUARDAR PDF</button>
+                <button onclick="exportPNG()" class="flex-1 bg-primary-theme text-white py-3 rounded-lg font-bold text-sm shadow-md" data-i18n="BTN_PNG">GUARDAR IMAGEN PNG</button>
+                <button onclick="exportPDF()" class="flex-1 bg-gray-800 text-white py-3 rounded-lg font-bold text-sm shadow-md" data-i18n="BTN_PDF">GUARDAR PDF</button>
             </div>
-            <p class="text-xs text-center text-gray-500 mb-4">La vista previa se ajusta a tu pantalla. El PNG/PDF se exportará en alta calidad.</p>
+            <p class="text-xs text-center text-gray-500 mb-4" data-i18n="PREVIEW_NOTE">La vista previa se ajusta a tu pantalla. El archivo se exportará en alta calidad.</p>
             
             <div class="overflow-hidden border-2 border-gray-300 rounded-lg shadow-lg bg-gray-200 flex justify-center items-start pt-4 pb-4 w-full h-[70vh] overflow-y-auto" id="preview-wrapper">
                 
@@ -210,52 +251,31 @@
                     <!-- Scaled Poster -->
                     <div id="poster-preview">
                         <!-- Top Logos & Title -->
-                        <div class="flex justify-between items-center mb-8 relative">
+                        <div class="flex justify-between items-center mb-10 relative">
                             <img src="7007.png" class="logo-img absolute left-0 top-0 rounded-full bg-black object-contain custom-logo" alt="Logo">
                             <div class="flex-1 text-center px-24">
-                                <h1 class="poster-header-text">ALABANZA MINISTERIO JERICO</h1>
+                                <h1 class="poster-header-text" id="poster-main-title">ALABANZA MINISTERIO JERICO</h1>
                             </div>
                             <img src="7007.png" class="logo-img absolute right-0 top-0 rounded-full bg-black object-contain custom-logo" alt="Logo">
                         </div>
 
-                        <!-- Dates -->
-                        <div class="grid grid-cols-2 gap-8 mb-12">
-                            <div class="date-box">
-                                <div class="text-sm font-bold text-gray-500 mb-1">FECHA Y HORA</div>
-                                <div class="text-2xl font-bold" id="out-v-fecha">10/06/2026</div>
-                                <div class="text-2xl font-bold" id="out-v-hora">6:30 PM</div>
-                            </div>
-                            <div class="date-box">
-                                <div class="text-sm font-bold text-gray-500 mb-1">FECHA Y HORA</div>
-                                <div class="text-2xl font-bold" id="out-d-fecha">10/08/2026</div>
-                                <div class="text-2xl font-bold" id="out-d-hora">9:00 AM</div>
-                            </div>
-                        </div>
-
-                        <!-- Services -->
-                        <div class="grid grid-cols-2 gap-8 mb-12">
-                            <div class="poster-box">
-                                <div class="box-title">SERVICIO VIERNES</div>
-                                <ul class="role-list" id="out-v-roles"></ul>
-                            </div>
-                            <div class="poster-box">
-                                <div class="box-title">SERVICIO DOMINGO</div>
-                                <ul class="role-list" id="out-d-roles"></ul>
-                            </div>
+                        <!-- Dynamic Services Grid -->
+                        <div id="out-services-grid" class="grid gap-8 mb-12">
+                            <!-- JS populated -->
                         </div>
 
                         <!-- Bottom row -->
-                        <div class="grid grid-cols-2 gap-8">
+                        <div id="out-bottom-row" class="grid grid-cols-2 gap-8">
                             <div class="poster-box flex flex-col justify-center text-center p-8">
-                                <div class="box-title">ORACIÓN NOCTURNA</div>
-                                <div class="text-2xl font-bold mb-8" id="out-ora-titulo">SEMANA DE AYUNO</div>
-                                <div class="text-xl font-bold text-gray-800 uppercase" id="out-ora-dias">MARTES MIERCOLES Y JUEVES</div>
+                                <div class="box-title" id="out-ora-header">ORACIÓN NOCTURNA</div>
+                                <div class="text-2xl font-bold mb-6" id="out-ora-titulo">SEMANA DE AYUNO</div>
+                                <div class="text-xl font-bold text-gray-800 uppercase whitespace-pre-wrap leading-tight" id="out-ora-dias">MARTES MIERCOLES Y JUEVES</div>
                             </div>
                             <div class="poster-box text-center">
-                                <div class="box-title">CAMISA DOMINGO <span id="out-camisa-titulo">BLANCA</span></div>
+                                <div class="box-title" id="out-camisa-titulo">CAMISA DOMINGO BLANCA</div>
                                 <div class="h-[250px] mt-4 flex items-center justify-center">
                                     <img id="out-camisa-foto" class="max-h-full max-w-full object-contain" style="display:none;">
-                                    <div id="out-camisa-placeholder" class="text-gray-400 font-bold border-2 border-dashed border-gray-300 w-full h-full flex items-center justify-center">FOTO DE CAMISA</div>
+                                    <div id="out-camisa-placeholder" class="text-gray-400 font-bold border-2 border-dashed border-gray-300 w-full h-full flex items-center justify-center" data-i18n="PIC_PLACEHOLDER">FOTO DE CAMISA</div>
                                 </div>
                             </div>
                         </div>
@@ -272,7 +292,7 @@
         <div id="guardados" class="tab-content">
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                 <div class="p-4 bg-gray-50 border-b">
-                    <h2 class="font-bold text-gray-700">MIS ANUNCIOS GUARDADOS</h2>
+                    <h2 class="font-bold text-gray-700" data-i18n="TAB_SAVED">MIS ANUNCIOS GUARDADOS</h2>
                 </div>
                 <div id="saved-list" class="divide-y divide-gray-100">
                     <!-- JS populated -->
@@ -284,347 +304,19 @@
     </main>
 
     <script>
-        const defaultRoles = [
-            "PRESIDE", "SEGUNDA VOZ", "CORO 1", "CORO 2", 
-            "CORO 3", "CORO 4", "PIANO 1", "PIANO 2", "BATERÍA"
-        ];
-        
-        let customLogoDataUrl = null;
-
-        // Initialize Form with default items or empty dynamic list
-        function initApp() {
-            loadDefaultRows('viernes', defaultRoles);
-            loadDefaultRows('domingo', defaultRoles);
-
-            // Add Event Listeners for Live Preview on any input change
-            document.addEventListener('input', updatePreview);
-
-            // Image Upload
-            document.getElementById('in-camisa-foto').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const imgDataUrl = event.target.result;
-                        document.getElementById('camisa-preview-small').src = imgDataUrl;
-                        document.getElementById('camisa-preview-small').classList.remove('hidden');
-                        
-                        document.getElementById('out-camisa-foto').src = imgDataUrl;
-                        document.getElementById('out-camisa-foto').style.display = 'block';
-                        document.getElementById('out-camisa-placeholder').style.display = 'none';
-                        
-                        document.getElementById('in-camisa-foto').dataset.base64 = imgDataUrl;
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            renderSavedList();
-            scalePreview();
-            window.addEventListener('resize', scalePreview);
-        }
-
-        function loadDefaultRows(day, list) {
-            const container = document.getElementById(`${day}-inputs`);
-            container.innerHTML = '';
-            list.forEach(role => {
-                appendRoleRow(day, role, '');
-            });
-        }
-
-        function appendRoleRow(day, roleName, personName) {
-            const container = document.getElementById(`${day}-inputs`);
-            const div = document.createElement('div');
-            div.className = 'flex items-center gap-2 role-row';
-            div.innerHTML = `
-                <input type="text" class="role-name-input w-36 border rounded p-1.5 text-xs font-bold uppercase bg-gray-50" value="${roleName}" placeholder="Puesto/Instrumento">
-                <input type="text" class="role-person-input flex-1 border rounded p-1.5 text-sm" value="${personName}" placeholder="Nombre de persona">
-                <button onclick="this.parentElement.remove(); updatePreview();" class="text-red-500 font-bold px-2 py-1 text-xs bg-red-50 rounded">X</button>
-            `;
-            container.appendChild(div);
-            updatePreview();
-        }
-
-        function addRoleField(day) {
-            appendRoleRow(day, 'NUEVO PUESTO', '');
-        }
-
-        // Tab Switching
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('border-[#8b5a2b]', 'text-[#8b5a2b]');
-                el.classList.add('border-transparent', 'text-gray-500');
-            });
-            
-            document.getElementById(tabId).classList.add('active');
-            document.getElementById(`tab-${tabId}`).classList.remove('border-transparent', 'text-gray-500');
-            document.getElementById(`tab-${tabId}`).classList.add('border-[#8b5a2b]', 'text-[#8b5a2b]');
-
-            if(tabId === 'vista') {
-                updatePreview();
-                setTimeout(scalePreview, 50);
-            }
-        }
-
-        // Live Preview Update
-        function updatePreview() {
-            // Dates
-            document.getElementById('out-v-fecha').innerText = document.getElementById('in-v-fecha').value || 'FECHA';
-            document.getElementById('out-v-hora').innerText = document.getElementById('in-v-hora').value || 'HORA';
-            document.getElementById('out-d-fecha').innerText = document.getElementById('in-d-fecha').value || 'FECHA';
-            document.getElementById('out-d-hora').innerText = document.getElementById('in-d-hora').value || 'HORA';
-
-            // Dynamic Roles for Viernes
-            const outV = document.getElementById('out-v-roles');
-            outV.innerHTML = '';
-            document.querySelectorAll('#viernes-inputs .role-row').forEach(row => {
-                const rName = row.querySelector('.role-name-input').value;
-                const pName = row.querySelector('.role-person-input').value;
-                if (pName.trim() !== '') {
-                    outV.innerHTML += `<li>• <strong>${rName}:</strong> ${pName}</li>`;
-                }
-            });
-
-            // Dynamic Roles for Domingo
-            const outD = document.getElementById('out-d-roles');
-            outD.innerHTML = '';
-            document.querySelectorAll('#domingo-inputs .role-row').forEach(row => {
-                const rName = row.querySelector('.role-name-input').value;
-                const pName = row.querySelector('.role-person-input').value;
-                if (pName.trim() !== '') {
-                    outD.innerHTML += `<li>• <strong>${rName}:</strong> ${pName}</li>`;
-                }
-            });
-
-            // Oracion
-            document.getElementById('out-ora-titulo').innerText = document.getElementById('in-ora-titulo').value || '';
-            document.getElementById('out-ora-dias').innerText = document.getElementById('in-ora-dias').value || '';
-
-            // Camisa
-            document.getElementById('out-camisa-titulo').innerText = document.getElementById('in-camisa-titulo').value || '';
-        }
-
-        // Scale poster for preview
-        function scalePreview() {
-            const wrapper = document.getElementById('preview-wrapper');
-            const scaleWrapper = document.getElementById('scale-wrapper');
-            const poster = document.getElementById('poster-preview');
-            
-            if(!wrapper || !poster || poster.offsetWidth === 0) return;
-            
-            const scale = (wrapper.clientWidth - 24) / 1000; 
-            poster.style.transform = `scale(${scale})`;
-            
-            if (scaleWrapper) {
-                scaleWrapper.style.width = `${1000 * scale}px`;
-                scaleWrapper.style.height = `${poster.offsetHeight * scale}px`;
-            }
-        }
-
-        // Test Logo Override
-        function updateLogo(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    customLogoDataUrl = event.target.result;
-                    document.querySelectorAll('.custom-logo').forEach(img => {
-                        img.src = customLogoDataUrl;
-                    });
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // Save & Load Functionality
-        function getDayData(dayId) {
-            let list = [];
-            document.querySelectorAll(`#${dayId}-inputs .role-row`).forEach(row => {
-                list.push({
-                    role: row.querySelector('.role-name-input').value,
-                    person: row.querySelector('.role-person-input').value
-                });
-            });
-            return list;
-        }
-
-        function getFormData() {
-            let data = {
-                vFecha: document.getElementById('in-v-fecha').value,
-                vHora: document.getElementById('in-v-hora').value,
-                dFecha: document.getElementById('in-d-fecha').value,
-                dHora: document.getElementById('in-d-hora').value,
-                oraTitulo: document.getElementById('in-ora-titulo').value,
-                oraDias: document.getElementById('in-ora-dias').value,
-                camisaTitulo: document.getElementById('in-camisa-titulo').value,
-                camisaImg: document.getElementById('in-camisa-foto').dataset.base64 || null,
-                viernes: getDayData('viernes'),
-                domingo: getDayData('domingo')
-            };
-            return data;
-        }
-
-        function loadFormData(data) {
-            document.getElementById('in-v-fecha').value = data.vFecha || '';
-            document.getElementById('in-v-hora').value = data.vHora || '';
-            document.getElementById('in-d-fecha').value = data.dFecha || '';
-            document.getElementById('in-d-hora').value = data.dHora || '';
-            document.getElementById('in-ora-titulo').value = data.oraTitulo || '';
-            document.getElementById('in-ora-dias').value = data.oraDias || '';
-            document.getElementById('in-camisa-titulo').value = data.camisaTitulo || '';
-            
-            // Load Viernes dynamic
-            const vContainer = document.getElementById('viernes-inputs');
-            vContainer.innerHTML = '';
-            if (data.viernes && data.viernes.length > 0) {
-                data.viernes.forEach(item => appendRoleRow('viernes', item.role, item.person));
-            }
-
-            // Load Domingo dynamic
-            const dContainer = document.getElementById('domingo-inputs');
-            dContainer.innerHTML = '';
-            if (data.domingo && data.domingo.length > 0) {
-                data.domingo.forEach(item => appendRoleRow('domingo', item.role, item.person));
-            }
-
-            if (data.camisaImg) {
-                document.getElementById('camisa-preview-small').src = data.camisaImg;
-                document.getElementById('camisa-preview-small').classList.remove('hidden');
-                document.getElementById('out-camisa-foto').src = data.camisaImg;
-                document.getElementById('out-camisa-foto').style.display = 'block';
-                document.getElementById('out-camisa-placeholder').style.display = 'none';
-                document.getElementById('in-camisa-foto').dataset.base64 = data.camisaImg;
-            } else {
-                document.getElementById('camisa-preview-small').classList.add('hidden');
-                document.getElementById('out-camisa-foto').style.display = 'none';
-                document.getElementById('out-camisa-placeholder').style.display = 'flex';
-                document.getElementById('in-camisa-foto').dataset.base64 = '';
-            }
-            
-            updatePreview();
-            showTab('crear');
-        }
-
-        function saveAnuncio() {
-            const name = document.getElementById('save-name').value.trim();
-            if (!name) return alert("Por favor, ingresa un nombre para guardar.");
-            
-            const savedList = JSON.parse(localStorage.getItem('jerico-anuncios') || '{}');
-            savedList[name] = {
-                date: new Date().toLocaleDateString(),
-                data: getFormData()
-            };
-            
-            localStorage.setItem('jerico-anuncios', JSON.stringify(savedList));
-            alert("Anuncio guardado exitosamente.");
-            document.getElementById('save-name').value = '';
-            renderSavedList();
-        }
-
-        function renderSavedList() {
-            const listDiv = document.getElementById('saved-list');
-            const savedList = JSON.parse(localStorage.getItem('jerico-anuncios') || '{}');
-            
-            if (Object.keys(savedList).length === 0) {
-                listDiv.innerHTML = '<div class="p-8 text-center text-gray-400 text-sm">No hay anuncios guardados.</div>';
-                return;
-            }
-            
-            let html = '';
-            for (const [name, item] of Object.entries(savedList)) {
-                html += `
-                    <div class="p-4 hover:bg-gray-50 flex justify-between items-center gap-4">
-                        <div class="flex-1 overflow-hidden">
-                            <h3 class="font-bold text-sm truncate">${name}</h3>
-                            <p class="text-xs text-gray-500">Guardado: ${item.date}</p>
-                        </div>
-                        <div class="flex gap-2 shrink-0">
-                            <button onclick="loadSaved('${name}')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-xs font-bold">ABRIR</button>
-                            <button onclick="deleteSaved('${name}')" class="bg-red-100 text-red-700 px-3 py-1 rounded text-xs font-bold">X</button>
-                        </div>
-                    </div>
-                `;
-            }
-            listDiv.innerHTML = html;
-        }
-
-        function loadSaved(name) {
-            const savedList = JSON.parse(localStorage.getItem('jerico-anuncios') || '{}');
-            if(savedList[name]) {
-                loadFormData(savedList[name].data);
-            }
-        }
-
-        function deleteSaved(name) {
-            if(confirm(`¿Estás seguro de que deseas eliminar el anuncio "${name}"?`)) {
-                const savedList = JSON.parse(localStorage.getItem('jerico-anuncios') || '{}');
-                delete savedList[name];
-                localStorage.setItem('jerico-anuncios', JSON.stringify(savedList));
-                renderSavedList();
-            }
-        }
-
-        // Export Functions
-        async function prepareForExport() {
-            updatePreview();
-            const poster = document.getElementById('poster-preview');
-            poster.style.transform = 'scale(1)';
-            
-            const canvas = await html2canvas(poster, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: '#fdfbf7'
-            });
-            
-            scalePreview();
-            return canvas;
-        }
-
-        async function exportPNG() {
-            try {
-                const btn = event.target;
-                const originalText = btn.innerText;
-                btn.innerText = "GENERANDO...";
-                
-                const canvas = await prepareForExport();
-                const a = document.createElement('a');
-                a.href = canvas.toDataURL("image/png", 1.0);
-                a.download = `Anuncio_Jerico_${new Date().getTime()}.png`;
-                a.click();
-                
-                btn.innerText = originalText;
-            } catch (err) {
-                alert("Error al exportar PNG.");
-                console.error(err);
-            }
-        }
-
-        async function exportPDF() {
-            try {
-                const btn = event.target;
-                const originalText = btn.innerText;
-                btn.innerText = "GENERANDO PDF...";
-                
-                const canvas = await prepareForExport();
-                const imgData = canvas.toDataURL('image/jpeg', 0.9);
-                
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                
-                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-                pdf.save(`Anuncio_Jerico_${new Date().getTime()}.pdf`);
-                
-                btn.innerText = originalText;
-            } catch (err) {
-                alert("Error al exportar PDF.");
-                console.error(err);
-            }
-        }
-
-        window.onload = initApp;
-    </script>
-</body>
-</html>
+        const translations = {
+            es: {
+                APP_TITLE: "ALABANZA MINISTERIO JERICO",
+                SUBTITLE: "Creador de anuncios semanales",
+                SETTINGS: "Configuración y Diseño",
+                COLOR_THEME: "Color Principal (Bordes/Títulos):",
+                COLOR_BG: "Color de Fondo (Poster):",
+                LANG: "Idioma / Language:",
+                LAYOUT: "Diseño de Servicios (Columnas):",
+                LAY_2: "2 Columnas",
+                LAY_1: "1 Columna",
+                SHOW_BOTTOM: "Mostrar sección Oración y Camisa abajo",
+                CLOSE: "CERRAR",
+                TAB_CREATE: "CREAR / EDITAR",
+                TAB_PREVIEW: "VISTA PREVIA",
+                TAB_SAVED: "GUARDADOS",
