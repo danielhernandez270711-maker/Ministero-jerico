@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#786451">
+  <meta name="description" content="Creador de anuncios semanales de Alabanza Ministerio Jerico.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>Alabanza Ministerio Jerico</title>
+</head>
+<body>
+<header class="app-header">
+  <img src="assets/logo.png" alt="Logo Ministerio Jerico" class="brand-logo">
+  <div><h1>ALABANZA MINISTERIO JERICO</h1><p>Creador de anuncios semanales</p></div>
+</header>
+
+<nav class="tabs" aria-label="Navegación principal">
+  <button class="tab active" data-target="editor">Crear anuncio</button>
+  <button class="tab" data-target="preview-section">Vista previa</button>
+  <button class="tab" data-target="saved-section">Mis anuncios guardados</button>
+</nav>
+
+<main>
+<section id="editor" class="panel">
+  <div class="section-top"><div><h2>Crear anuncio</h2><p>Completa la información de esta semana.</p></div>
+    <button id="newBtn" class="button secondary">Nuevo</button></div>
+  <form id="announcementForm">
+    <div class="card">
+      <h3>Fechas y horarios</h3>
+      <div class="two">
+        <label>Viernes · Fecha<input type="date" id="fridayDate"></label>
+        <label>Viernes · Hora<input type="time" id="fridayTime" value="18:30"></label>
+        <label>Domingo · Fecha<input type="date" id="sundayDate"></label>
+        <label>Domingo · Hora<input type="time" id="sundayTime" value="09:00"></label>
+      </div>
+    </div>
+    <div class="two align-start">
+      <div class="card">
+        <h3>Servicio viernes</h3>
+        <div id="fridayFields" class="fields"></div>
+      </div>
+      <div class="card">
+        <h3>Servicio domingo</h3>
+        <div id="sundayFields" class="fields"></div>
+      </div>
+    </div>
+    <div class="two align-start">
+      <div class="card">
+        <h3>Oración nocturna</h3>
+        <label>Título o anuncio<input id="prayerTitle" value="SEMANA DE AYUNO" maxlength="90"></label>
+        <label>Días de la semana<input id="prayerDays" value="MARTES, MIÉRCOLES Y JUEVES" maxlength="100"></label>
+        <label>Información adicional<textarea id="prayerInfo" rows="3" maxlength="240" placeholder="Información adicional (opcional)"></textarea></label>
+      </div>
+      <div class="card">
+        <h3>Camisa domingo</h3>
+        <label>Anuncio de camisa<input id="shirtTitle" value="CAMISA DOMINGO BLANCA" maxlength="90"></label>
+        <label class="upload-label">Foto de camisa<input id="shirtImage" type="file" accept="image/*"></label>
+        <img id="shirtThumb" class="shirt-thumb" alt="Vista previa de la camisa" hidden>
+        <button type="button" id="removePhoto" class="button secondary small" hidden>Quitar fotografía</button>
+        <p class="hint">Puedes elegir una foto de tu galería o tomar una fotografía.</p>
+      </div>
+    </div>
+    <div class="card save-card">
+      <label>Nombre de esta semana<input id="weekName" maxlength="70" placeholder="Ej. Anuncio del 10 de junio"></label>
+      <button type="button" id="saveBtn" class="button primary">Guardar anuncio</button>
+      <span id="saveStatus" class="status" role="status"></span>
+    </div>
+  </form>
+</section>
+
+<section id="preview-section" class="panel">
+  <div class="section-top"><div><h2>Vista previa</h2><p>El diseño se actualiza mientras editas.</p></div></div>
+  <div class="poster-wrap"><div id="poster" class="poster" aria-label="Anuncio semanal"></div></div>
+  <div class="export-actions">
+    <button id="pngBtn" class="button primary">Guardar imagen PNG</button>
+    <button id="pdfBtn" class="button secondary">Guardar PDF</button>
+  </div>
+  <p id="exportStatus" class="hint" role="status"></p>
+</section>
+
+<section id="saved-section" class="panel">
+  <div class="section-top"><div><h2>Mis anuncios guardados</h2><p>Los anuncios se guardan en este dispositivo.</p></div></div>
+  <div id="savedList" class="saved-list"><p class="hint">Todavía no hay anuncios guardados.</p></div>
+</section>
+</main>
+<footer>ALABANZA MINISTERIO JERICO · Tus anuncios permanecen en este dispositivo.</footer>
+<script src="app.js"></script>
+</body>
+</html>
